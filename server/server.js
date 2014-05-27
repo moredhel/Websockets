@@ -38,8 +38,8 @@ function testServer(){
 
             socket.ondata = function(d, start, end){
             //var data = d.toString('utf8', start, end);
-            var original_data = d.toString('utf8', start, end);
-            var data = original_data.split('\ufffd')[0].slice(1);
+            var original_data = d.toString('utf8', start, end); 
+            var data = original_data.split('\ufffd')[0].slice(1); 
             if(data == "kill"){
             socket.end();
             } else {
