@@ -1,5 +1,7 @@
+var http = require("http");
+var url = require("url");
 var WebSocketServer = require('ws').Server
-    , wss = new WebSocketServer({port: 8889});
+    , wss = new WebSocketServer({port: 8890});
 wss.on('connection', function(ws) {
     ws.on('message', function(message) {
         //console.log('received: %s', message);
@@ -15,3 +17,7 @@ wss.on('connection', function(ws) {
     });
 });
 
+http.createServer(function (req, res) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.end('Hello World\n');
+    }).listen(8889, '127.0.0.1');
