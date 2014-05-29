@@ -9,10 +9,18 @@ port = 8889;
 static_files = './public';
 
 wss.on('connection', function(ws) {
-    ws.on('message', function(message) {
+    //TODO, add support for user tracking
+    ws.on('message', function(message, flags) {
+        var readStream =
+            fs.createReadStream("test.mp3")
+        readStream.on('data', function(data) {
+                ws.send(data, {binary: true, mask: false});
+        });
+        readStream.on('end', function(data) {
+                ws.send("{\"type\": \"buffer_reset\", \"msg\": \"\"}");
+        });
         try {
-            handleInput(message);
-            //ws.send(handleInput(message));
+            ws.send(handleInput(message));
             //ws.send(JSON.stringify(input));
         } catch (e) { console.log(e);}
     });
@@ -32,16 +40,22 @@ function handleInput(input) {
     var msg = JSON.parse(input);
     switch(msg.type) {
         case 'connection':
+            return pack(msg.type,'');
             break;
         case 'message':
+            return pack(msg.type, msg.message);
             break;
         case 'dirlist': //request dir list
-            console.log(getDir());
-            return JSON.stringify(getDir());
+            //console.log(getDir());
+            return pack(msg.type, getDir());
             break;
         default:
             return "{\"type\": \"error\", \"msg\": "+msg+"}";
     }
+}
+function pack(type,msg) {
+    return JSON.stringify({ type: type,
+             msg: msg || '' });
 }
 //read_files
 function getDir() {
