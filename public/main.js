@@ -2,9 +2,20 @@
 
 //var conn = new WebSocket('ws://127.0.0.1:8890');
 //var x;
+var buffer = {
+    data: [],
+    finished: false,
+    push: function(x) {
+        if(this.finished) {
+            this.finished = false;
+            this.data = [];
+        }
+        this.data.push(x);
+    }
+}
 var conn = {
     ws: new WebSocket('ws://127.0.0.1:8890'),
-    msg: '' }
+    ret: '' }
 
 var Msg = { //creating the JSON
     create: function(type, msg) {
@@ -13,10 +24,10 @@ var Msg = { //creating the JSON
             type != 'dirlist') {
             throw 'invalid message';
         }
-        var msg = {
+        var ret = {
             type: type,
             message: msg || ''};
-        return JSON.stringify(msg);
+        return JSON.stringify(ret);
     },
     parse: function(msg) {
         try {
@@ -31,5 +42,18 @@ var Msg = { //creating the JSON
 conn.ws.onopen = function() { console.log("connection opened");};
 conn.ws.onerror = function() { console.log("error");};
 conn.ws.onmessage = function(msg) {
-    conn.msg = Msg.parse(msg.data);
+    if(msg.data instanceof Blob) {
+        buffer.push(msg.data);
+        return 0;
+    }
+    conn.ret = handle(Msg.parse(msg.data));
 };
+function handle(options) {
+    switch(options.type) { 
+        case 'buffer_reset':
+            buffer.finished = true;
+            break;
+        default:
+            return options;
+    }
+}
