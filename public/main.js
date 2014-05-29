@@ -1,7 +1,3 @@
-//the main javascript file
-
-//var conn = new WebSocket('ws://127.0.0.1:8890');
-//var x;
 var buffer = {
     data: [],
     finished: false,
@@ -15,21 +11,25 @@ var buffer = {
 }
 var conn = {
     ws: new WebSocket('ws://127.0.0.1:8890'),
-    ret: '' }
+    ret: ''
+}
 
 var Msg = { //creating the JSON
     create: function(type, msg) {
         if(type != 'connection' &&
             type != 'message' &&
+            type != 'start_buffer' &&
             type != 'dirlist') {
             throw 'invalid message';
         }
         var ret = {
             type: type,
-            message: msg || ''};
+            message: msg || ''
+        };
         return JSON.stringify(ret);
     },
     parse: function(msg) {
+        if(msg === '') return ''; //empty string was throwing error
         try {
             var parsed = JSON.parse(msg);
             return parsed;
@@ -39,7 +39,7 @@ var Msg = { //creating the JSON
     }
 }
 
-conn.ws.onopen = function() { console.log("connection opened");};
+conn.ws.onopen = function() { conn.ws.send(Msg.create('start_buffer','')); };
 conn.ws.onerror = function() { console.log("error");};
 conn.ws.onmessage = function(msg) {
     if(msg.data instanceof Blob) {
@@ -49,7 +49,7 @@ conn.ws.onmessage = function(msg) {
     conn.ret = handle(Msg.parse(msg.data));
 };
 function handle(options) {
-    switch(options.type) { 
+    switch(options.type) {
         case 'buffer_reset':
             buffer.finished = true;
             break;
