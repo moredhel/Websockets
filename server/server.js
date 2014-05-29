@@ -11,16 +11,8 @@ static_files = './public';
 wss.on('connection', function(ws) {
     //TODO, add support for user tracking
     ws.on('message', function(message, flags) {
-        var readStream =
-            fs.createReadStream("test.mp3")
-        readStream.on('data', function(data) {
-                ws.send(data, {binary: true, mask: false});
-        });
-        readStream.on('end', function(data) {
-                ws.send("{\"type\": \"buffer_reset\", \"msg\": \"\"}");
-        });
         try {
-            ws.send(handleInput(message));
+            ws.send(handleInput(message, ws));
             //ws.send(JSON.stringify(input));
         } catch (e) { console.log(e);}
     });
@@ -35,7 +27,7 @@ wss.on('connection', function(ws) {
   //  res.end();
 //}).listen(8889, '127.0.0.1');
 
-function handleInput(input) {
+function handleInput(input, ws) {
     //this function handles all inputs
     var msg = JSON.parse(input);
     switch(msg.type) {
@@ -48,6 +40,15 @@ function handleInput(input) {
         case 'dirlist': //request dir list
             //console.log(getDir());
             return pack(msg.type, getDir());
+        case 'start_buffer':
+            var readStream =
+                fs.createReadStream("test.mp3")
+            readStream.on('data', function(data) {
+                    ws.send(data, {binary: true, mask: false});
+            });
+            readStream.on('end', function(data) {
+                    ws.send("{\"type\": \"buffer_reset\", \"msg\": \".\"}");
+            });
             break;
         default:
             return "{\"type\": \"error\", \"msg\": "+msg+"}";
