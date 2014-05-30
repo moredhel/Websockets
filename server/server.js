@@ -48,9 +48,8 @@ function handleInput(input, ws) {
         case 'change_track':
             //handle reading file and starting new buffer
             var dir_list = getDir();
-            console.log(dir_list);
             var readStream =
-                fs.createReadStream(directory+dir_list[0]);
+                fs.createReadStream(directory+dir_list[msg.message]);
             readStream.on('data', function(data) {
                     ws.send(data, {binary: true, mask: false});
             });

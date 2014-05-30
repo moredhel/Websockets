@@ -2,7 +2,9 @@ function handle(options) {
     switch(options.type) {
         case 'buffer_reset':
             //create final blob
+            buffer.blob = new Blob();
             buffer.blob = new Blob(buffer.data);
+            blob_url = URL.createObjectURL(buffer.blob);
             buffer.finished = true;
             break;
         case 'dirlist':
@@ -22,6 +24,7 @@ function changeSong(elem) {
 }
 
 var audio;
+var blob_url = '';
 var conn = new Connection();
 window.onload = function() {
     audio = document.getElementById('target');
