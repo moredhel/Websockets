@@ -1,5 +1,6 @@
 var buffer = {
     data: [],
+    blob: new Blob([]),
     finished: false,
     push: function(x) {
         if(this.finished) {
@@ -11,7 +12,7 @@ var buffer = {
     get: function() { conn.ws.send(JSON.stringify({type: 'start_buffer', msg: ''})); }
 }
 var conn = {
-    ws: new WebSocket('ws://127.0.0.1:8890'),
+    ws: new WebSocket('ws://192.168.0.186:8890'),
     ret: ''
 }
 
@@ -40,8 +41,8 @@ var Msg = { //creating the JSON
     }
 }
 
-conn.ws.onopen = function() {}; //don't start buffer immediately, otherwise there is a percetpable lag
-conn.ws.onerror = function() { console.log("error");};
+conn.ws.onopen = function() {console.log("connected");}; //don't start buffer immediately, otherwise there is a percetpable lag
+conn.ws.onerror = function(e) { console.log(e);};
 conn.ws.onmessage = function(msg) {
     if(msg.data instanceof Blob) {
         buffer.push(msg.data);
@@ -52,6 +53,8 @@ conn.ws.onmessage = function(msg) {
 function handle(options) {
     switch(options.type) {
         case 'buffer_reset':
+            //create final blob
+            buffer.blob = new Blob(buffer.data);
             buffer.finished = true;
             break;
         default:
