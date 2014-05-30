@@ -1,5 +1,6 @@
 var ws_port = 8890;
 var port = 8889;
+var directory = '/home/moredhel/Music/youtube/';
 
 var http = require("http");
 var url = require("url");
@@ -43,8 +44,13 @@ function handleInput(input, ws) {
             //console.log(getDir());
             return pack(msg.type, getDir());
         case 'start_buffer':
+            break;
+        case 'change_track':
+            //handle reading file and starting new buffer
+            var dir_list = getDir();
+            console.log(dir_list);
             var readStream =
-                fs.createReadStream("public/test.mp3")
+                fs.createReadStream(directory+dir_list[0]);
             readStream.on('data', function(data) {
                     ws.send(data, {binary: true, mask: false});
             });
@@ -53,7 +59,7 @@ function handleInput(input, ws) {
             });
             break;
         default:
-            return "{\"type\": \"error\", \"msg\": "+msg+"}";
+            return "{\"type\": \"error\", \"msg\": "+msg.type+"}";
     }
 }
 function pack(type,msg) {
@@ -62,11 +68,11 @@ function pack(type,msg) {
 }
 //read_files
 function getDir() {
-    return fs.readdirSync('/home/moredhel/Music/youtube');
+    return fs.readdirSync(directory);
 }
 
 function readfile(filename) {
-    fs.readFile(static_files + filename, 'utf8', function(err, data) {
+    fs.readFile(directory + filename, 'utf8', function(err, data) {
         if (err) throw err;
         console.log('OK: ' + filename);
         console.log(data)
