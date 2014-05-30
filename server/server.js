@@ -1,11 +1,12 @@
+var ws_port = 8890;
+var port = 8889;
+
 var http = require("http");
 var url = require("url");
 var fs = require("fs");
 var WebSocketServer = require('ws').Server
-    , wss = new WebSocketServer({port: 8890});
+    , wss = new WebSocketServer({host: '0.0.0.0', port: ws_port});
 
-ws_port = 8890;
-port = 8889;
 static_files = './public';
 
 wss.on('connection', function(ws) {
@@ -30,6 +31,7 @@ wss.on('connection', function(ws) {
 function handleInput(input, ws) {
     //this function handles all inputs
     var msg = JSON.parse(input);
+    console.log(msg);
     switch(msg.type) {
         case 'connection':
             return pack(msg.type,'');
@@ -42,7 +44,7 @@ function handleInput(input, ws) {
             return pack(msg.type, getDir());
         case 'start_buffer':
             var readStream =
-                fs.createReadStream("test.mp3")
+                fs.createReadStream("public/test.mp3")
             readStream.on('data', function(data) {
                     ws.send(data, {binary: true, mask: false});
             });
