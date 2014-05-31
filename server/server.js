@@ -1,6 +1,6 @@
 var ws_port = 8890;
 var port = 8889;
-var directory = '/home/moredhel/Music/youtube/';
+var directory = '/home/moredhel/Music/Jenni/Nirvana/MTV Unplugged in New York/';
 
 var http = require("http");
 var url = require("url");
@@ -47,15 +47,17 @@ function handleInput(input, ws) {
             break;
         case 'change_track':
             //handle reading file and starting new buffer
-            var dir_list = getDir();
-            var readStream =
-                fs.createReadStream(directory+dir_list[msg.message]);
-            readStream.on('data', function(data) {
-                    ws.send(data, {binary: true, mask: false});
-            });
-            readStream.on('end', function(data) {
-                    ws.send("{\"type\": \"buffer_reset\", \"msg\": \".\"}");
-            });
+                var dir_list = getDir();
+                    try {
+                var readStream =
+                    fs.createReadStream(directory+dir_list[msg.message]);
+                    } catch (e) { console.log(e); }
+                readStream.on('data', function(data) {
+                        ws.send(data, {binary: true, mask: false});
+                });
+                readStream.on('end', function(data) {
+                        ws.send("{\"type\": \"buffer_reset\", \"msg\": \".\"}");
+                });
             break;
         default:
             return "{\"type\": \"error\", \"msg\": "+msg.type+"}";

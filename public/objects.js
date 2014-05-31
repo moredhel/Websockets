@@ -1,7 +1,7 @@
 var buffer = {
     //buffer object
     data: [],
-    blob: new Blob([]),
+    blobs: [],
     finished: false,
     push: function(x) {
         if(this.finished) {

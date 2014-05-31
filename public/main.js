@@ -2,10 +2,22 @@ function handle(options) {
     switch(options.type) {
         case 'buffer_reset':
             //create final blob
-            buffer.blob = new Blob();
-            buffer.blob = new Blob(buffer.data);
-            blob_url = URL.createObjectURL(buffer.blob);
+            buffer.blobs.push(new Blob(buffer.data));
+            var point = 0;
+            if(buffer.blobs.length != 0) {
+                point = buffer.blobs.length - 1;
+            }
+            console.log
+            blob_url = URL.createObjectURL(buffer.blobs[point]);
+            audio.src = blob_url;
+            audio.play();
             buffer.finished = true;
+            while (true) {
+                if(buffer.blobs.length == 1) {
+                    break;
+                }
+                buffer.blobs.splice(0,1);
+            }
             break;
         case 'dirlist':
             var ul = document.getElementById('tracks');
